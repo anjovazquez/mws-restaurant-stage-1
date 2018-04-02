@@ -4,8 +4,9 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
-  <link rel="stylesheet" media="screen and (max-width:800px)" href="css/styles.css" type="text/css" />
-  <link rel="stylesheet" media="screen and (min-width:801px)" href="css/styles800.css" type="text/css" />
+  <link rel="stylesheet" href="css/styles.css" type="text/css" />
+  <!-- media="screen and (max-width:800px)"  -->
+  <!--<link rel="stylesheet" media="screen and (min-width:801px)" href="css/styles800.css" type="text/css" />-->
   <title>Restaurant Reviews</title>
 </head>
 
@@ -13,26 +14,26 @@
   <header>
     <nav>
       <h1>
-        <a href="/">Restaurant Reviews</a>
+        <a href="/" role="link">Restaurant Reviews</a>
       </h1>
     </nav>
   </header>
 
-  <main id="maincontent">
-    <section id="map-container">
+  <main id="maincontent" role="main">
+    <section id="map-container" role="application">
       <div id="map"></div>
     </section>
     <section>
       <div class="filter-options">
         <h2>Filter Results</h2>
-        <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
+        <select id="neighborhoods-select" name="neighborhoods" role="listbox" onchange="updateRestaurants()">
           <option value="all">All Neighborhoods</option>
         </select>
-        <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()">
+        <select id="cuisines-select" name="cuisines" role="listbox" onchange="updateRestaurants()">
           <option value="all">All Cuisines</option>
         </select>
       </div>
-      <ul id="restaurants-list"></ul>
+      <ul id="restaurants-list" role="list"></ul>
     </section>
   </main>
 
@@ -57,7 +58,7 @@
 
   <footer id="footer">
     Copyright (c) 2017
-    <a href="/">
+    <a href="/" role="link">
       <strong>Restaurant Reviews</strong>
     </a> All Rights Reserved.
   </footer>

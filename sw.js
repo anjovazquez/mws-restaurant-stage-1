@@ -1,8 +1,9 @@
-var cacheName = 'restaurant-cache';
+let version = 1;
+let staticCacheName = `restaurant-cache-${version}`;
 
 self.addEventListener('install', function (event) {
     event.waitUntil(
-        caches.open(cacheName).then(function (cache) {
+        caches.open(staticCacheName).then(function (cache) {
             return cache.addAll([
                 '/',
                 'index.html',
@@ -24,6 +25,8 @@ self.addEventListener('install', function (event) {
                 'img/9.jpg',
                 'img/10.jpg'
             ]);
+        }).catch(function(error){
+            console.log('Cache load error!'+error);
         })
     );
 });
@@ -33,8 +36,8 @@ self.addEventListener('activate', function(event) {
       caches.keys().then(function(cacheNames) {
         return Promise.all(
           cacheNames.filter(function(cacheName) {
-            return cacheName.startsWith('restaurant-cache') &&
-                   cacheName != this.cacheName;
+            return cacheName.startsWith('restaurant-cache-') &&
+                   cacheName != staticCacheName;
           }).map(function(cacheName) {
             return caches.delete(cacheName);
           })
