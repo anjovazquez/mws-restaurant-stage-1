@@ -11,6 +11,7 @@
 </head>
 
 <body class="inside">
+  <a class="skip-link" href="#restaurant-container">Skip to main content</a>
   <!-- Beginning header -->
   <header>
     <!-- Beginning nav -->
@@ -18,8 +19,8 @@
       <h1><a href="/" role="link">Restaurant Reviews</a></h1>
     </nav>
     <!-- Beginning breadcrumb -->
-    <ul id="breadcrumb" role="navigation">
-      <li><a href="/" role="link">Home</a></li>
+    <ul id="breadcrumb" aria-label="Breadcrumb">
+      <li><a href="/" role="">Home</a></li>
     </ul>
     <!-- End breadcrumb -->
     <!-- End nav -->
@@ -36,7 +37,7 @@
     <div class="restaurant-info">
     <!-- Beginning restaurant -->
     <section id="restaurant-container">
-      <h1 id="restaurant-name"></h1>
+      <h2 id="restaurant-name"></h2>
       <img id="restaurant-img">
       <p id="restaurant-cuisine"></p>
       <p id="restaurant-address"></p>
@@ -59,6 +60,20 @@
   <!-- End footer -->
 
   <!-- Beginning scripts -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        if ('serviceWorker' in navigator) {
+          if (!navigator.serviceWorker) return;
+            navigator.serviceWorker.register('sw.js').then(function (registration) {
+            console.log('Registration ok!'+registration.scope);
+          }).catch(function () {
+            console.log('Registration ko!');
+          });
+        }
+      });
+    }
+  </script>
   <!-- Database helpers -->
   <script type="text/javascript" src="js/dbhelper.js"></script>
   <!-- Main javascript file -->

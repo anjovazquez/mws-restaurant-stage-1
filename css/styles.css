@@ -102,6 +102,12 @@ nav h1 a {
     color: #01447e;
     text-decoration: underline;
 }
+
+#breadcrumb [aria-current="page"] {
+  color: #000;
+  text-decoration: none;
+}
+
 /* ====================== Map ====================== */
 #map {
   height: 400px;
@@ -193,7 +199,7 @@ nav h1 a {
   /*min-height: 248px;*/
   max-width: 100%;
 }
-#restaurants-list li h1 {
+#restaurants-list li h2 {
   color: #f18200;
   font-family: Arial,sans-serif;
   font-size: 14pt;
@@ -368,4 +374,19 @@ p.review-rating {
   #restaurant-hours td {
     font-size: 1.5em;
   }
+}
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #BF1722;
+  color: white;
+  padding: 8px;
+  z-index: 10000;
+  border-bottom-right-radius: 8px;
+}
+
+.skip-link:focus {
+  top: 0;
 }

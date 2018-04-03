@@ -1,26 +1,14 @@
-const RESTAURANT_PRECACHE = 'restaurant-precache-v2';
+const RESTAURANT_PRECACHE = 'restaurant-precache-v4';
 const RESTAURANT_CACHE_RUNTIME = 'runtime';
 
 // A list of local resources we always want to be cached.
-const RESTAURANT_PRECACHE_URLS = [    
-        '/',
-        'index.html',
-        'restaurant.html',
-        'js/dbhelper.js',
-        'js/main.js',
-        'js/restaurant_info.js',
-        'data/restaurants.json',
-        'css/styles.css',
-        'img/1.jpg',
-        'img/2.jpg',
-        'img/3.jpg',
-        'img/4.jpg',
-        'img/5.jpg',
-        'img/6.jpg',
-        'img/7.jpg',
-        'img/8.jpg',
-        'img/9.jpg',
-        'img/10.jpg'
+const RESTAURANT_PRECACHE_URLS = [
+  '/',
+  'js/dbhelper.js',
+  'js/main.js',
+  'js/restaurant_info.js',
+  'data/restaurants.json',
+  'css/styles.css'
 ];
 
 // The install handler takes care of precaching the resources we always need.
@@ -46,7 +34,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-self.addEventListener('fetch', event => {
+/*self.addEventListener('fetch', event => {
   if (event.request.url.startsWith(self.location.origin)) {
     event.respondWith(
       caches.match(event.request).then(cachedResponse => {
@@ -60,6 +48,21 @@ self.addEventListener('fetch', event => {
             return cache.put(event.request, response.clone()).then(() => {
               return response;
             });
+          });
+        });
+      })
+    );
+  }
+});*/
+
+self.addEventListener('fetch', event => {
+  if (event.request.url.startsWith(self.location.origin)) {
+    event.respondWith(
+      caches.open(RESTAURANT_CACHE_RUNTIME).then(function (cache) {
+        return cache.match(event.request).then(function (response) {
+          return response || fetch(event.request).then(function (response) {
+            cache.put(event.request, response.clone());
+            return response;
           });
         });
       })
