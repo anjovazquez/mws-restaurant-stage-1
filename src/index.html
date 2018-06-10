@@ -4,9 +4,9 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
+  <!-- inject:css -->
   <link rel="stylesheet" href="css/styles.css" type="text/css" />
-  <!-- media="screen and (max-width:800px)"  -->
-  <!--<link rel="stylesheet" media="screen and (min-width:801px)" href="css/styles800.css" type="text/css" />-->
+  <!-- endinject -->
   <title>Restaurant Reviews</title>
 </head>
 
@@ -52,8 +52,10 @@
       });
     }
   </script>
-  <script type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
+  <!-- inject:js -->
+  <script src="js/dbhelper.js"></script>
+  <script src="js/main.js"></script>
+  <!-- endinject -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3wDU7ryUSd0qYaEH_hL6rLPUkq9IA_gs&libraries=places&callback=initMap"></script>
 
 

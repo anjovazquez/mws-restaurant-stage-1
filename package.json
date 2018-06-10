@@ -1,0 +1,42 @@
+{
+  "name": "mws-restaurant-stage-1",
+  "version": "1.0.0",
+  "description": "Udacity Mobile Web Specialist Project",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.1",
+    "gulp-clean": "^0.4.0",
+    "gulp-clean-css": "^3.9.4",
+    "gulp-concat": "^2.6.1",
+    "gulp-gzip": "^1.4.2",
+    "gulp-htmlclean": "^2.7.22",
+    "gulp-htmlmin": "^4.0.0",
+    "gulp-image": "^4.3.0",
+    "gulp-imagemin": "^4.1.0",
+    "gulp-inject": "^4.3.2",
+    "gulp-jsmin": "^0.1.5",
+    "gulp-uglify": "^3.0.0",
+    "gulp-uglify-es": "^1.0.4",
+    "gulp-webp": "^3.0.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "browser-sync": "^2.24.4",
+    "gulp": "^3.9.1",
+    "idb": "^2.1.2"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anjovazquez/mws-restaurant-stage-1.git"
+  },
+  "author": "anjovazquez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anjovazquez/mws-restaurant-stage-1/issues"
+  },
+  "homepage": "https://github.com/anjovazquez/mws-restaurant-stage-1#readme"
+}
