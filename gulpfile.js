@@ -25,11 +25,14 @@ var paths = {
     cssSrc: 'src/css/**.css',
     imgSrc: 'src/img/min/**.*',
 
+    manifestSrc: 'src/*.json',
+    manifestImg: 'src/images/**',
+
     dist: 'dist/',
     jsDist: 'dist/js',
     cssDist: 'dist/css',
     imgDist: 'dist/img',
-    
+
     jsDistFiles: 'dist/js/**.*',
     cssDistFiles: 'dist/css/**.css',
 
@@ -41,7 +44,7 @@ gulp.task('clean', function () {
         .pipe(clean());
 });
 
-gulp.task('copy', ['clean'], function () {    
+gulp.task('copy', ['clean'], function () {
     var css = gulp.src(paths.cssDistFiles);
     var js = gulp.src(paths.jsDistFiles);
     gulp.src(paths.jsSrc)
@@ -71,6 +74,10 @@ gulp.task('copy', ['clean'], function () {
     gulp.src(paths.swSrc)
         //.pipe(jsmin())
         .pipe(gulp.dest(paths.dist));
+    gulp.src(paths.manifestSrc)
+        .pipe(gulp.dest(paths.dist));
+    gulp.src(paths.manifestImg)
+        .pipe(gulp.dest(paths.dist+'/images/'));
 });
 
 gulp.task('images:compress', function () {
@@ -83,22 +90,22 @@ gulp.task('images:compress', function () {
 
 gulp.task('serve:dev', (() => {
     browserSync.init({
-      server: {
-        baseDir: envs.dev,
-        //middleware: [compress()]
-      }, ui: {
-        port: 3000
-      }, port: 3000
-    });  
+        server: {
+            baseDir: envs.dev,
+            //middleware: [compress()]
+        }, ui: {
+            port: 3000
+        }, port: 3000
+    });
 }));
 
 gulp.task('serve:dist', ['copy'], (() => {
     browserSync.init({
-      server: {
-        baseDir: envs.dist,
-        //middleware: [compress()]
-      }, ui: {
-        port: 3000
-      }, port: 3000
-    });  
+        server: {
+            baseDir: envs.dist,
+            //middleware: [compress()]
+        }, ui: {
+            port: 3000
+        }, port: 3000
+    });
 }));
