@@ -4,7 +4,6 @@
   "description": "Udacity Mobile Web Specialist Project",
   "main": "gulpfile.js",
   "dependencies": {
-    "gulp": "^3.9.1",
     "gulp-babel": "^7.0.1",
     "gulp-clean": "^0.4.0",
     "gulp-clean-css": "^3.9.4",

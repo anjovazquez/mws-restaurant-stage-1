@@ -1,28 +1,27 @@
 importScripts('/js/idb.js');
 
+function createRestaurantDatabase(upgradeDB) {
+  idb.open('restaurants', 1, function (upgradeDB) {
+    console.log("creating restaurants database");
+    upgradeDB.createObjectStore('restaurants', { keyPath: 'id' });
+    for (var i = 1; i <= 10; i++) {
+      upgradeDB.createObjectStore('reviews-' + i, { keyPath: 'id' });
+    }
+  })
+}
+
 self.addEventListener('activate', event => {
   event.waitUntil(
-    idb.open('restaurants', 1, function (upgradeDB) {
-
-      console.log("Creating Restaurant List Object Store");
-
-      upgradeDB.createObjectStore('restaurants', { keyPath: 'id' });
-
-      for (var i = 1; i <= 10; i++) {
-        upgradeDB.createObjectStore('reviews-' + i, { keyPath: 'id' })
-      }
-    })
+    createRestaurantDatabase()
   )
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    createDB()
-  )
+  event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('fetch', event => {
-  /*event.respondWith(async function () {
+  event.respondWith(async function () {
     return fetch(event.request.url);
   });
     
@@ -46,5 +45,7 @@ self.addEventListener('fetch', event => {
             });
         }
       });
-  });*/
+  });
 });
+
+
