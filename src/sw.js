@@ -1,10 +1,11 @@
 importScripts('/js/idb.js');
 
 const RESTAURANT_PRECACHE = 'restaurant-precache-v4';
-const RESTAURANT_CACHE_RUNTIME = 'runtime';
 
 const RESTAURANT_PRECACHE_URLS = [
   '/',
+  '/index.html',
+  '/restaurant.html',
   'js/dbhelper.js',
   'js/main.js',
   'js/restaurant_info.js',
@@ -36,7 +37,7 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('activate', event => {
-  const currentCaches = [RESTAURANT_PRECACHE, RESTAURANT_CACHE_RUNTIME];
+  const currentCaches = [RESTAURANT_PRECACHE];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return cacheNames.filter(cacheName => !currentCaches.includes(cacheName));
@@ -49,17 +50,17 @@ self.addEventListener('activate', event => {
 
 });
 
-function addAllToDB(storeName, items) {
+function addRestaurantsToDB(storeName, items) {
   idb.open('restaurants', 1).then(function (db) {
     var tx = db.transaction(storeName, 'readwrite');
     var store = tx.objectStore(storeName);
 
     return Promise.all(items.map(function (item) {
-      console.log("Adding Item", item);
+      console.log("Adding Restaurant", item);
       return store.put(item);
     })
     ).then(function (e) {
-      console.log("Added Successfully");
+      console.log("DB Restaurant Completed");
     }).catch(function (e) {
       tx.abort();
       console.log(e);
@@ -70,7 +71,9 @@ function addAllToDB(storeName, items) {
 self.addEventListener('fetch', event => {
 
   if (!isFetchToApi(event.request.url)) {
-    event.respondWith(fetchStaticCache(event));
+    if (shouldBeCached(event.request)) {
+      event.respondWith(fetchStaticCache(event));
+    }
   }
   else {
     console.log(event.request.url);
@@ -84,29 +87,29 @@ self.addEventListener('fetch', event => {
       // Return items from database
       return store.getAll();
     }).then((resultDb) => {
-      //From DB
-      if(resultDb.length==0){
-        event.respondWith(fetch(event.request.url).catch((error)=>{
-          console.log('Response from DB');
-            const indexDBResponse = new Response(JSON.stringify(resultDb), generateOkHttp());
-            console.log("Response from indexDB to send to fetch ", resultDb);
-            return indexDBResponse;
-        }))
-      }
       //From Network
-      else{
-        event.respondWith(fetch(event.request.url).then((response)=>{
-          return response.json().then(function(data){
+      if (resultDb.length == 0) {
+        return fetch(event.request.url).then((response) => {
+          return response.json().then(function (data) {
             console.log(event.request.url, 'json data', data);
 
-                // Adds data to database
-                addAllToDB(storeName, data);
-                console.log('Saving to DB and responding from FETCH', data);
+            // Adds data to database
+            addRestaurantsToDB(storeName, data);
+            console.log('Saving to DB and responding from FETCH', data);
 
-                const fetchResponse = new Response(JSON.stringify(data), generateOkHttp());
-                return fetchResponse;
+            const fetchResponse = new Response(JSON.stringify(data), generateOkHttp());
+            return fetchResponse;
           })
-        }))
+        })
+      }
+      //From DB
+      else {
+        //event.respondWith(        return fetch(event.request.url).catch((error) => {
+          console.log('Response from DB');
+          const dbResponse = new Response(JSON.stringify(resultDb), generateOkHttp());
+          console.log(dbResponse);
+          return dbResponse;
+        //}))
       }
     })
   }
@@ -123,16 +126,16 @@ function generateOkHttp() {
 }
 
 function fetchStaticCache(event) {
-  if (event.request.url.includes(self.location.origin) && event.request.method == "GET" && !event.request.url.includes("browser-sync")) {
-    event.respondWith(caches.open(RESTAURANT_CACHE_RUNTIME).then(function (cache) {
-      return cache.match(event.request).then(function (response) {
-        return response || fetch(event.request).then(function (response) {
-          cache.put(event.request, response.clone());
-          return response;
-        });
-      });
-    }));
-  }
+  return caches.match(event.request).then(function (response) {
+    return response || fetch(event.request).then(function (response) {
+      //caches.put(event.request, response.clone());
+      return response;
+    });
+  });
+}
+
+function shouldBeCached(request) {
+  return request.url.includes(self.location.origin) && request.method == "GET" && !request.url.includes("browser-sync");
 }
 
 function isFetchToApi(url) {
