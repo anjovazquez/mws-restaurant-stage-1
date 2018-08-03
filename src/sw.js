@@ -104,12 +104,10 @@ self.addEventListener('fetch', event => {
       }
       //From DB
       else {
-        //event.respondWith(        return fetch(event.request.url).catch((error) => {
-          console.log('Response from DB');
-          const dbResponse = new Response(JSON.stringify(resultDb), generateOkHttp());
-          console.log(dbResponse);
-          return dbResponse;
-        //}))
+        console.log('Response from DB');
+        const dbResponse = new Response(JSON.stringify(resultDb), generateOkHttp());
+        console.log(dbResponse);
+        return dbResponse;
       }
     })
   }

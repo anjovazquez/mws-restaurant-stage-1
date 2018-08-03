@@ -88,17 +88,6 @@ gulp.task('images:compress', function () {
         .pipe(gulp.dest('img/min'));
 });
 
-gulp.task('serve:dev', (() => {
-    browserSync.init({
-        server: {
-            baseDir: envs.dev,
-            //middleware: [compress()]
-        }, ui: {
-            port: 3000
-        }, port: 3000
-    });
-}));
-
 gulp.task('serve:dist', ['copy'], (() => {
     browserSync.init({
         server: {
