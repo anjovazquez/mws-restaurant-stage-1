@@ -48,17 +48,17 @@ gulp.task('copy', ['clean'], function () {
     var css = gulp.src(paths.cssDistFiles);
     var js = gulp.src(paths.jsDistFiles);
     gulp.src(paths.jsSrc)
-        //.pipe(jsmin())
+        .pipe(jsmin())
         //.pipe(concat('all.js'))
         //.pipe(uglify())
         //.pipe(gzip())
         .pipe(gulp.dest(paths.jsDist));
 
     gulp.src(paths.cssSrc)
-        /*.pipe(cleanCSS({ debug: true }, (details) => {
+        .pipe(cleanCSS({ debug: true }, (details) => {
             console.log(`${details.name}: ${details.stats.originalSize}`);
             console.log(`${details.name}: ${details.stats.minifiedSize}`);
-        }))*/
+        }))
         .pipe(gulp.dest(paths.cssDist));
 
     gulp.src(paths.imgSrc)
@@ -67,12 +67,12 @@ gulp.task('copy', ['clean'], function () {
     gulp.src(paths.htmlSrc)
         //.pipe(inject(css, { relative: true }))
         //.pipe(inject(js, { relative: true }))
-        //.pipe(htmlclean())
-        //.pipe(htmlmin({collapseWhitespace: true}))
+        .pipe(htmlclean())
+        .pipe(htmlmin({collapseWhitespace: true}))
         .pipe(gulp.dest(paths.dist));
 
     gulp.src(paths.swSrc)
-        //.pipe(jsmin())
+        .pipe(jsmin())
         .pipe(gulp.dest(paths.dist));
     gulp.src(paths.manifestSrc)
         .pipe(gulp.dest(paths.dist));
