@@ -88,38 +88,38 @@ self.addEventListener('fetch', event => {
   else {
     console.log(event.request.url);
     let storeName = 'restaurants';
+    event.respondWith(
+      idb.open('restaurants', 1).then(function (db) {
 
-    idb.open('restaurants', 1).then(function (db) {
+        var tx = db.transaction(storeName, 'readonly');
+        var store = tx.objectStore(storeName);
 
-      var tx = db.transaction(storeName, 'readonly');
-      var store = tx.objectStore(storeName);
+        // Return items from database
+        return store.getAll();
+      }).then((resultDb) => {
+        //From Network
+        if (resultDb.length == 0) {
+          return fetch(event.request.url).then((response) => {
+            return response.json().then(function (data) {
+              console.log(event.request.url, 'json data', data);
 
-      // Return items from database
-      return store.getAll();
-    }).then((resultDb) => {
-      //From Network
-      if (resultDb.length == 0) {
-        return fetch(event.request.url).then((response) => {
-          return response.json().then(function (data) {
-            console.log(event.request.url, 'json data', data);
+              // Adds data to database
+              addRestaurantsToDB(storeName, data);
+              console.log('Saving to DB and responding from FETCH', data);
 
-            // Adds data to database
-            addRestaurantsToDB(storeName, data);
-            console.log('Saving to DB and responding from FETCH', data);
-
-            const fetchResponse = new Response(JSON.stringify(data), generateOkHttp());
-            return fetchResponse;
+              const fetchResponse = new Response(JSON.stringify(data), generateOkHttp());
+              return fetchResponse;
+            })
           })
-        })
-      }
-      //From DB
-      else {
-        console.log('Response from DB');
-        const dbResponse = new Response(JSON.stringify(resultDb), generateOkHttp());
-        console.log(dbResponse);
-        return dbResponse;
-      }
-    })
+        }
+        //From DB
+        else {
+          console.log('Response from DB');
+          const dbResponse = new Response(JSON.stringify(resultDb), generateOkHttp());
+          console.log(dbResponse);
+          return dbResponse;
+        }
+      }));
   }
 });
 
@@ -134,16 +134,16 @@ function generateOkHttp() {
 }
 
 function fetchStaticCache(event) {
-  return caches.match(event.request).then(function (response) {
+  return caches.match(event.request, { ignoreSearch: true }).then(function (response) {
     return response || fetch(event.request).then(function (response) {
       //caches.put(event.request, response.clone());
       return response;
     });
-  });
+});
 }
 
 function shouldBeCached(request) {
-  return request.url.includes(self.location.origin) && request.method == "GET" && !request.url.includes("browser-sync");
+  return request.method == "GET" && !request.url.includes("browser-sync");
 }
 
 function isFetchToApi(url) {

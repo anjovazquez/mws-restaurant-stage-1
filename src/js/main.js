@@ -1,7 +1,7 @@
 let restaurants,
   neighborhoods,
-  cuisines
-var map
+  cuisines,
+  map
 var markers = []
 
 /**

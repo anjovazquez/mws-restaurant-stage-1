@@ -121,7 +121,7 @@ nav.breadcrumb {
 }
 /* ====================== Restaurant Filtering ====================== */
 .filter-options {
-  max-width: 100%;
+  max-width: 96%;
   /*height: 50px;*/
   background-color: #3397DB;
   align-items: center;
