@@ -293,22 +293,35 @@ nav.breadcrumb {
   display: flex;
   flex-wrap: wrap;
 }
-#restaurant-container, #reviews-container, #reviews-container-form {
+#restaurant-container, #restaurant-reviews {
   border-bottom: 1px solid #d9d9d9;
   border-top: 1px solid #fff;
   padding: 30px 40px 30px;
   /*max-width: 100%;*/
 }
 @media (max-width: 800px) {
-  #restaurant-container, #reviews-container {
+  #restaurant-container, #restaurant-reviews {
     width: 100%;
   }
 }
 
 @media (min-width: 801px) {
-  #restaurant-container, #reviews-container {
+  #restaurant-container, #restaurant-reviews {
     width: calc(49% - 10px - 4%);
   }
+}
+
+#restaurant-reviews {
+  display:flex;
+  flex-direction: column;
+}
+
+#restaurant-reviews h3 {
+  color: #8b0000;
+  font-size: 24pt;
+  font-weight: 300;
+  letter-spacing: -1px;
+  padding-bottom: 1pt;
 }
 
 #review-form {
@@ -343,10 +356,11 @@ nav.breadcrumb {
 #review-form input#submit {
   height: 48px;
   font-size: 18px;
-  background-color: #185a8e;
+  background-color: #8b0000;
   color: #fff;
   border: 0;
   margin-top: 8px;
+  border-radius: 5px;
 }
 
 .review-header {

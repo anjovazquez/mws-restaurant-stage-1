@@ -139,7 +139,7 @@ function fetchStaticCache(event) {
       //caches.put(event.request, response.clone());
       return response;
     });
-});
+  });
 }
 
 function shouldBeCached(request) {
@@ -148,4 +148,51 @@ function shouldBeCached(request) {
 
 function isFetchToApi(url) {
   return url.indexOf('restaurants') != -1;
+}
+
+self.addEventListener('sync', function (event) {
+  if (event.tag === 'pending_review') {
+    event.waitUntil(sendPendingReviews().then(function () {
+      console.log('Review synchronized');
+    }).catch(function (error) {
+      console.log('Error in review synchronization',error);
+    }));
+  }
+});
+
+function sendPendingReviews() {
+  //Query pendingreviews in local database
+  return idb.open('pending_review', 1).then((database)=>{
+    var transaction = database.transaction('pending_review','readonly');
+    return transaction.objectStore('pending_review').getAll();
+  }).then((reviews)=>{
+    return Promise.all(reviews.map((review)=>{
+
+      let reviewId = review.id;
+
+       //Send pending reviews
+      return fetch('http://localhost:1337/reviews', {
+        method: 'POST',
+        body: JSON.stringify(review),
+        headers: {'Accept':'application/json','Content-Type':'application/json'}
+      }).then((response)=>{
+        return response.json();
+      }).then((responseData)=>{
+        console.log("Syncronized data"+responseData);
+
+         //Delete local database
+        if(responseData){
+          idb.open('pending_review', 1)
+            .then((database)=>{
+              var transaction = database.transaction('pending_review','readwrite');
+              return transaction.objectStore('pending_review').delete(reviewId);
+            });
+        }
+      })
+    }));
+  });
+
+ 
+
+ 
 }

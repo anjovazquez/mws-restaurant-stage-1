@@ -52,6 +52,25 @@ class DBHelper {
     });
   }
 
+  static fetchReviewById(id, callback) {
+
+    fetch(`http://localhost:1337/reviews/?restaurant_id=`+id)
+      .then(response => {
+          if (response.status === 200) {
+            response.json()
+              .then(json => {
+                callback(null, json);
+                return
+              }).catch(error => {
+              callback(error, null)
+            });
+          } else {
+            callback((`Request failed. Returned status of ${response.status}`), null);
+          }
+        }
+      ).catch(error => callback(error, null));
+  }
+
   /**
    * Fetch restaurants by a cuisine type with proper error handling.
    */

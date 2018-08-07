@@ -55,9 +55,12 @@
       </section>
       <!-- end restaurant -->
       <!-- Beginning reviews -->
-      <section id="reviews-container">
-        <ul id="reviews-list" role="list"></ul>
-        <form id="review-form">
+      <div id="restaurant-reviews">
+        <section id="reviews-container">
+          <ul id="reviews-list" role="list"></ul>
+        </section>
+        <section id="review-add-section">
+          <form id="review-form" action="">
             <h3>Add a review</h3>
             <input type="text" placeholder="Name" id="name">
             <select name="rating" id="rating">
@@ -71,8 +74,9 @@
             <textarea name="comment" id="comment" cols="30" rows="10" placeholder="How was your experience?"></textarea>
             <input id="submit" type="submit">
           </form>
-      </section>
-     
+        </section>
+      </div>
+
       <!-- End reviews -->
       <div></div>
   </main>
@@ -88,6 +92,7 @@
   <!-- End footer -->
 
   <!-- Beginning scripts -->
+  <script src="js/idb.js"></script>
   <script src="js/load_sw.js"></script>
   <!-- inject:js -->
   <script src="js/dbhelper.js"></script>
