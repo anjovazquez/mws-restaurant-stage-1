@@ -57,7 +57,22 @@
       <!-- Beginning reviews -->
       <section id="reviews-container">
         <ul id="reviews-list" role="list"></ul>
+        <form id="review-form">
+            <h3>Add a review</h3>
+            <input type="text" placeholder="Name" id="name">
+            <select name="rating" id="rating">
+              <option value="none" disabled selected>Select Rating</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+            <textarea name="comment" id="comment" cols="30" rows="10" placeholder="How was your experience?"></textarea>
+            <input id="submit" type="submit">
+          </form>
       </section>
+     
       <!-- End reviews -->
       <div></div>
   </main>

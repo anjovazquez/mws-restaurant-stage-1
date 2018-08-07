@@ -48,7 +48,7 @@ gulp.task('copy', ['clean'], function () {
     var css = gulp.src(paths.cssDistFiles);
     var js = gulp.src(paths.jsDistFiles);
     gulp.src(paths.jsSrc)
-        .pipe(jsmin())
+        //.pipe(jsmin())
         //.pipe(concat('all.js'))
         //.pipe(uglify())
         //.pipe(gzip())
@@ -72,7 +72,7 @@ gulp.task('copy', ['clean'], function () {
         .pipe(gulp.dest(paths.dist));
 
     gulp.src(paths.swSrc)
-        .pipe(jsmin())
+        //.pipe(jsmin())
         .pipe(gulp.dest(paths.dist));
     gulp.src(paths.manifestSrc)
         .pipe(gulp.dest(paths.dist));
