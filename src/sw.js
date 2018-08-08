@@ -1,4 +1,4 @@
-importScripts('/js/idb.js');
+importScripts('/js/idb.js.gz');
 
 const RESTAURANT_PRECACHE = 'restaurant-precache-v4';
 
@@ -6,9 +6,11 @@ const RESTAURANT_PRECACHE_URLS = [
   '/',
   '/index.html',
   '/restaurant.html',
-  'js/dbhelper.js',
+  //'js/dbhelper.js',
   'js/main.js',
-  'js/restaurant_info.js',
+  'js/idb.js',
+  'js/rest.js',
+  //'js/restaurant_info.js',
   'css/styles.css',
   'img/1.webp',
   'img/2.webp',
@@ -19,7 +21,8 @@ const RESTAURANT_PRECACHE_URLS = [
   'img/7.webp',
   'img/8.webp',
   'img/9.webp',
-  'img/10.webp'
+  'img/10.webp',
+  'img/empty.webp'
 ];
 
 function createRestaurantDatabase(upgradeDB) {
