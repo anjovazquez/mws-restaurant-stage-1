@@ -36,7 +36,7 @@ var paths = {
     jsDistFiles: 'dist/js/**.*',
     cssDistFiles: 'dist/css/**.css',
 
-    images: './img/*.jpg'
+    images: 'src/img/*.{jpg,png}'
 };
 
 gulp.task('clean', function () {
@@ -48,7 +48,7 @@ gulp.task('copy', ['clean'], function () {
     var css = gulp.src(paths.cssDistFiles);
     var js = gulp.src(paths.jsDistFiles);
     gulp.src(paths.jsSrc)
-        //.pipe(jsmin())
+        .pipe(jsmin())
         //.pipe(concat('all.js'))
         //.pipe(uglify())
         //.pipe(gzip())
@@ -68,27 +68,29 @@ gulp.task('copy', ['clean'], function () {
         //.pipe(inject(css, { relative: true }))
         //.pipe(inject(js, { relative: true }))
         .pipe(htmlclean())
-        .pipe(htmlmin({collapseWhitespace: true}))
+        .pipe(htmlmin({ collapseWhitespace: true }))
         .pipe(gulp.dest(paths.dist));
 
     gulp.src(paths.swSrc)
-        //.pipe(jsmin())
+        .pipe(jsmin())
         .pipe(gulp.dest(paths.dist));
     gulp.src(paths.manifestSrc)
         .pipe(gulp.dest(paths.dist));
     gulp.src(paths.manifestImg)
-        .pipe(gulp.dest(paths.dist+'/images/'));
+        .pipe(gulp.dest(paths.dist + '/images/'));
 });
 
 gulp.task('images:compress', function () {
     gulp.src(paths.images)
-        .pipe(image())
-        .pipe(imagemin())
+        //.pipe(image())
+        .pipe(imagemin({
+            progressive: true
+        }))
         .pipe(webp())
-        .pipe(gulp.dest('img/min'));
+        .pipe(gulp.dest('src/img/min'));
 });
 
-gulp.task('serve:dist', ['copy'], (() => {
+gulp.task('serve:dist', ['images:compress', 'copy'], (() => {
     browserSync.init({
         server: {
             baseDir: envs.dist,

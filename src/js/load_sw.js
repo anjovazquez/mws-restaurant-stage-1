@@ -23,7 +23,7 @@ if ('serviceWorker' in navigator) {
                         event.preventDefault();
 
                         let pending_review = {
-                            restaurant: restaurantId,
+                            restaurant_id: restaurantId,
                             name: name.value,
                             rating: rating.options[rating.selectedIndex].value,
                             comments: comment.value
