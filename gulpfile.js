@@ -72,6 +72,7 @@ gulp.task('css', ['clean'], function () {
             console.log(`${details.name}: ${details.stats.originalSize}`);
             console.log(`${details.name}: ${details.stats.minifiedSize}`);
         }))
+        .pipe(gzip())
         .pipe(gulp.dest(paths.cssDist));
 });
 
@@ -153,7 +154,6 @@ gulp.task('html_rest_no_min', ['js_rest', 'css'], function () {
 
 gulp.task('images:compress', function () {
     return gulp.src(paths.images)
-        //.pipe(image())
         .pipe(imagemin({
             progressive: true
         }))
@@ -165,7 +165,6 @@ gulp.task('serve:dist_no_min', ['sw', 'manifest', 'images', 'html_rest_no_min', 
     browserSync.init({
         server: {
             baseDir: envs.dist,
-            //middleware: [compress()]
         }, ui: {
             port: 3000
         }, port: 3000
@@ -183,12 +182,23 @@ gulp.task('serve:dist', ['sw', 'manifest', 'images', 'html_rest', 'html_main'], 
              ]*/
             middleware: function (req, res, next) {
                 var gzip = compress();
-                if (req._parsedUrl.pathname.endsWith("gz")) {
-                    console.log(req._parsedUrl.pathname);
-                    res.setHeader('Content-Encoding', 'gzip');
 
+                if (req._parsedUrl.pathname.endsWith(".css.gz")) {
+                    res.setHeader('Content-Type', 'text/css');
+                    res.setHeader('Content-Encoding', 'gzip');
+                    console.log(req._parsedUrl.pathname);
                     //gzip(req, res, next);
                 }
+                else {
+                    if (req._parsedUrl.pathname.endsWith("gz")) {
+                        res.setHeader('Content-Encoding', 'gzip');
+
+                        //gzip(req, res, next);
+                    }
+                    else {
+                    }
+                }
+
                 next();
             }
         }, ui: {
