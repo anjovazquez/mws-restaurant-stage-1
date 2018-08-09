@@ -200,6 +200,16 @@ createRestaurantHTML = (restaurant) => {
   name.innerHTML = restaurant.name;
   restaurantCardBody.append(name);
 
+  const favouriteCheck = document.createElement('input');
+  favouriteCheck.setAttribute('type', 'checkbox');
+  favouriteCheck.setAttribute('id', 'toggle-heart');
+  restaurantCardBody.append(favouriteCheck);
+
+  const favourite = document.createElement('label');
+  favourite.innerHTML = '❤';
+  favourite.htmlFor = 'toggle-heart';
+  restaurantCardBody.append(favourite);
+
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;
   restaurantCardBody.append(neighborhood);

@@ -18,6 +18,7 @@ if ('serviceWorker' in navigator) {
                     var rating = form.querySelector('#rating');
                     var comment = form.querySelector('#comment');
                     var restaurantId = getParameterByName('id');
+                    var reviewList = document.querySelector('#reviews-list');
 
                     form.addEventListener('submit', (event) => {
                         event.preventDefault();
@@ -26,7 +27,8 @@ if ('serviceWorker' in navigator) {
                             restaurant_id: restaurantId,
                             name: name.value,
                             rating: rating.options[rating.selectedIndex].value,
-                            comments: comment.value
+                            comments: comment.value,
+                            createdAt: Date.now()
                         };
 
                         //Insert database pending review
@@ -37,15 +39,35 @@ if ('serviceWorker' in navigator) {
                             var trans = database.transaction('pending_review', 'readwrite');
                             return trans.objectStore('pending_review').put(pending_review);
                         }).then(() => {
-                            return registration.sync.register('pending_review').then(function () {
-                                console.log('Synchronization registered' + pending_review);
-                            });
+                            reviewList.appendChild(createReviewHTML(pending_review));
+                            resetReviewForm();
+                            if(!navigator.onLine){
+                                console.log('Offline');
+                                window.addEventListener('online', (event)=>{
+                                    console.log('Online again');
+                                    registration.sync.register('pending_review').then(function () {
+                                        console.log('Synchronization registered' + pending_review);
+                                    });
+                                });
+                                return;
+                            }
+                            else{
+                                return registration.sync.register('pending_review').then(function () {
+                                    console.log('Synchronization registered' + pending_review);
+                                });
+                            }
                         });
                     });
 
                 }
 
+                if (window.location.pathname === '/index.html') {
+                    console.log("hello");
+                }
+
             });
+
+            
         }
     });
 }

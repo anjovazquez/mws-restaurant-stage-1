@@ -12,6 +12,7 @@ var gulp = require('gulp'),
     htmlmin = require('gulp-htmlmin'),
     jsmin = require('gulp-jsmin'),
     compress = require('compression'),
+    sass = require('gulp-sass'),
     browserSync = require('browser-sync');
 
 var envs = {
@@ -66,7 +67,13 @@ gulp.task('manifest', ['clean'], function () {
         .pipe(gulp.dest(paths.dist + '/images/'));
 });
 
-gulp.task('css', ['clean'], function () {
+gulp.task('sass', ['clean'], function () {
+    return gulp.src('src/css/**.scss')
+      .pipe(sass().on('error', sass.logError))
+      .pipe(gulp.dest(paths.cssDist));
+  });
+
+gulp.task('css', ['clean', 'sass'], function () {
     return gulp.src(paths.cssSrc)
         .pipe(cleanCSS({ debug: true }, (details) => {
             console.log(`${details.name}: ${details.stats.originalSize}`);

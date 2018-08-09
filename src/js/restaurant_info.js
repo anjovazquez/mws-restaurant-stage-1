@@ -174,8 +174,8 @@ createReviewHTML = (review) => {
 
   const date = document.createElement('p');
   date.setAttribute('class','review-date');
-  date.setAttribute('aria-label','date of review '+review.date);
-  date.innerHTML = review.date;
+  date.setAttribute('aria-label','date of review '+review.createdAt);
+  date.innerHTML = getDateFromTimestamp(review.createdAt);
   reviewHeader.appendChild(date);  
   li.appendChild(reviewHeader);
 
@@ -227,4 +227,15 @@ getParameterByName = (name, url) => {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+resetReviewForm = () => {
+  document.getElementById('name').value = '';
+  document.getElementById('rating').selectedIndex = 0;
+  document.getElementById('comment').value = '';
+}
+
+getDateFromTimestamp = (timeStamp) => {
+  let date = new Date(timeStamp);
+  return date.getDate() +'/' + (date.getMonth() + 1) + '/' + date.getFullYear();
 }
