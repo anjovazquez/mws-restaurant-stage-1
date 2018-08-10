@@ -27,8 +27,19 @@ const RESTAURANT_PRECACHE_URLS = [
 
 function createRestaurantDatabase(upgradeDB) {
   idb.open('restaurants', 1, function (upgradeDB) {
-    console.log("creating restaurants database");
+    /*switch(upgradeDB.oldVersion) {
+      case 0: 
+        upgradeDB.createObjectStore('restaurants', { keyPath: 'id' });
+        console.log("creating restaurants database");
+      case 1:
+        const reviews = upgradeDB.createObjectStore('reviews', { keyPath: 'id'});
+        reviews.createIndex('restaurant', 'restaurantId');
+        console.log("creating reviews database");
+  }*/
+
     upgradeDB.createObjectStore('restaurants', { keyPath: 'id' });
+    const reviews = upgradeDB.createObjectStore('reviews', { keyPath: 'id' });
+    reviews.createIndex('restaurant', 'restaurantId');
   })
 }
 
@@ -81,6 +92,24 @@ function addRestaurantsToDB(storeName, items) {
   })
 }
 
+function addReviewsToDB(storeName, items) {
+  idb.open('restaurants', 1).then(function (db) {
+    var tx = db.transaction(storeName, 'readwrite');
+    var store = tx.objectStore(storeName);
+
+    return Promise.all(items.map(function (item) {
+      console.log("Adding Review", item);
+      return store.put(item);
+    })
+    ).then(function (e) {
+      console.log("DB Review Completed");
+    }).catch(function (e) {
+      tx.abort();
+      console.log(e);
+    })
+  })
+}
+
 self.addEventListener('fetch', event => {
 
   if (!isFetchToApi(event.request.url)) {
@@ -89,40 +118,80 @@ self.addEventListener('fetch', event => {
     }
   }
   else {
-    console.log(event.request.url);
-    let storeName = 'restaurants';
-    event.respondWith(
-      idb.open('restaurants', 1).then(function (db) {
 
-        var tx = db.transaction(storeName, 'readonly');
-        var store = tx.objectStore(storeName);
+    if (isFetchRestaurants(event.request.url)) {
+      console.log(event.request.url);
+      let storeName = 'restaurants';
+      event.respondWith(
+        idb.open('restaurants', 1).then(function (db) {
 
-        // Return items from database
-        return store.getAll();
-      }).then((resultDb) => {
-        //From Network
-        if (resultDb.length == 0) {
-          return fetch(event.request.url).then((response) => {
-            return response.json().then(function (data) {
-              console.log(event.request.url, 'json data', data);
+          var tx = db.transaction(storeName, 'readonly');
+          var store = tx.objectStore(storeName);
 
-              // Adds data to database
-              addRestaurantsToDB(storeName, data);
-              console.log('Saving to DB and responding from FETCH', data);
+          // Return items from database
+          return store.getAll();
+        }).then((resultDb) => {
+          //From Network
+          if (resultDb.length == 0) {
+            return fetch(event.request.url).then((response) => {
+              return response.json().then(function (data) {
+                console.log(event.request.url, 'json data', data);
 
-              const fetchResponse = new Response(JSON.stringify(data), generateOkHttp());
-              return fetchResponse;
+                // Adds data to database
+                addRestaurantsToDB(storeName, data);
+                console.log('Saving to DB and responding from FETCH', data);
+
+                const fetchResponse = new Response(JSON.stringify(data), generateOkHttp());
+                return fetchResponse;
+              })
             })
-          })
-        }
-        //From DB
-        else {
-          console.log('Response from DB');
-          const dbResponse = new Response(JSON.stringify(resultDb), generateOkHttp());
-          console.log(dbResponse);
-          return dbResponse;
-        }
-      }));
+          }
+          //From DB
+          else {
+            console.log('Response from DB');
+            const dbResponse = new Response(JSON.stringify(resultDb), generateOkHttp());
+            console.log(dbResponse);
+            return dbResponse;
+          }
+        }));
+    }
+    else {
+      event.respondWith(
+        //if (isFetchReviews(event.request.url)) {
+        idb.open('restaurants', 1).then(function (db) {
+          var tx = db.transaction('reviews', 'readonly');
+          var store = tx.objectStore('reviews');
+          return store.getAll();
+        }).then((reviews) => {
+
+          let url = new URL(event.request.url);
+          let restIdFilter = url.searchParams.get("restaurant_id");
+          const reviewsByRest = reviews.filter(review => review.restaurantId === restIdFilter || review.restaurantId === parseInt(restIdFilter));
+
+          //From Network
+          if (reviewsByRest.length == 0) {
+            return fetch(event.request.url).then((response) => {
+              return response.json().then(function (data) {
+                console.log(event.request.url, 'json data', data);
+
+                // Adds data to database
+                addReviewsToDB('reviews', data);
+                console.log('Saving to DB and responding from FETCH', data);
+
+                const fetchResponse = new Response(JSON.stringify(data), generateOkHttp());
+                return fetchResponse;
+              })
+            })
+          }
+          //From DB
+          else {           
+            console.log('Response from DB');
+            const dbResponse = new Response(JSON.stringify(reviewsByRest), generateOkHttp());
+            console.log(dbResponse);
+            return dbResponse;
+          }
+        }));
+    }
   }
 });
 
@@ -150,6 +219,14 @@ function shouldBeCached(request) {
 }
 
 function isFetchToApi(url) {
+  return isFetchRestaurants(url) || isFetchReviews(url);
+}
+
+function isFetchReviews(url) {
+  return url.indexOf('reviews') != -1;
+}
+
+function isFetchRestaurants(url) {
   return url.indexOf('restaurants') != -1;
 }
 
@@ -158,15 +235,15 @@ self.addEventListener('sync', function (event) {
     event.waitUntil(sendPendingReviews().then(function () {
       console.log('Review synchronized');
     }).catch(function (error) {
-      console.log('Error in review synchronization',error);
+      console.log('Error in review synchronization', error);
     }));
   }
-  else{
+  else {
     if (event.tag === 'pending_favourite') {
       event.waitUntil(sendPendingFavourites().then(function () {
-        console.log('Review synchronized');
+        console.log('Favourite synchronized');
       }).catch(function (error) {
-        console.log('Error in review synchronization',error);
+        console.log('Error in favourite synchronization', error);
       }));
     }
   }
@@ -174,33 +251,59 @@ self.addEventListener('sync', function (event) {
 
 function sendPendingFavourites() {
   console.log();
+  return idb.open('pending_favourite', 1).then((database) => {
+    var transaction = database.transaction('pending_favourite', 'readonly');
+    return transaction.objectStore('pending_favourite').getAll();
+  }).then((favourites) => {
+    return Promise.all(favourites.map((favourite) => {
+      let favId = favourite.id;
+      let restaurantId = favourite.restaurantId;
+      let fav = favourite.favourite;
+
+      return fetch('http://localhost:1337/restaurants/' + restaurantId + '/?is_favorite=' + fav, {
+        method: 'PUT',
+        headers: new Headers(),
+        mode: 'cors',
+        cache: 'default'
+      }).then(response => {
+        if (response.status === 200) {
+          idb.open('pending_favourite', 1)
+            .then((database) => {
+              var transaction = database.transaction('pending_favourite', 'readwrite');
+              return transaction.objectStore('pending_favourite').delete(favId);
+            });
+        }
+      }).catch(error => console.log(error));
+    }));
+  });
+
 }
 
 function sendPendingReviews() {
   //Query pendingreviews in local database
-  return idb.open('pending_review', 1).then((database)=>{
-    var transaction = database.transaction('pending_review','readonly');
+  return idb.open('pending_review', 1).then((database) => {
+    var transaction = database.transaction('pending_review', 'readonly');
     return transaction.objectStore('pending_review').getAll();
-  }).then((reviews)=>{
-    return Promise.all(reviews.map((review)=>{
+  }).then((reviews) => {
+    return Promise.all(reviews.map((review) => {
 
       let reviewId = review.id;
 
-       //Send pending reviews
+      //Send pending reviews
       return fetch('http://localhost:1337/reviews', {
         method: 'POST',
         body: JSON.stringify(review),
-        headers: {'Accept':'application/json','Content-Type':'application/json'}
-      }).then((response)=>{
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+      }).then((response) => {
         return response.json();
-      }).then((responseData)=>{
-        console.log("Syncronized data"+responseData);
+      }).then((responseData) => {
+        console.log("Syncronized data" + responseData);
 
-         //Delete local database
-        if(responseData){
+        //Delete local database
+        if (responseData) {
           idb.open('pending_review', 1)
-            .then((database)=>{
-              var transaction = database.transaction('pending_review','readwrite');
+            .then((database) => {
+              var transaction = database.transaction('pending_review', 'readwrite');
               return transaction.objectStore('pending_review').delete(reviewId);
             });
         }
@@ -208,7 +311,7 @@ function sendPendingReviews() {
     }));
   });
 
- 
 
- 
+
+
 }

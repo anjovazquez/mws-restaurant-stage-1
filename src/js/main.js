@@ -202,7 +202,13 @@ createRestaurantHTML = (restaurant) => {
 
   const favourite = document.createElement('label');
   favourite.innerHTML = '❤';
-  favourite.className = 'fav_no';
+  console.log(JSON.stringify({rest : restaurant.id, fav : restaurant.is_favorite}));
+  if(restaurant.is_favorite === 'true' || restaurant.is_favorite === true){
+    favourite.className = 'fav_yes';
+  }
+  else{    
+    favourite.className = 'fav_no';
+  }
   favourite.setAttribute('data-id', restaurant.id);
   restaurantCardBody.append(favourite);
 
@@ -217,10 +223,12 @@ createRestaurantHTML = (restaurant) => {
 
     navigator.serviceWorker.ready.then(function (registration) {
       
+      
       let pending_favourite = { 
         favourite: e.target.className === 'fav_yes',
         restaurantId : e.target.getAttribute('data-id') };
 
+      console.log(JSON.stringify(pending_favourite));  
       idb.open('pending_favourite', 1, function (upgradeDb) {
         upgradeDb.createObjectStore('pending_favourite', { autoIncrement: true, keyPath: 'id' });
       }).then((database) => {
@@ -241,6 +249,21 @@ createRestaurantHTML = (restaurant) => {
             console.log('Synchronization registered' + pending_favourite);
           });
         }
+      });
+      console.log(JSON.stringify(pending_favourite));
+      idb.open('restaurants', 1).then(function (db) {
+        var tx = db.transaction('restaurants', 'readonly');
+        var store = tx.objectStore('restaurants');
+        // Return items from database
+        return store.get(parseInt(pending_favourite.restaurantId));
+      }).then((rest) => {
+        rest.is_favorite=pending_favourite.favourite;
+        let restId = rest.id;
+        idb.open('restaurants', 1).then(function (db) {
+          var tx = db.transaction('restaurants', 'readwrite');
+          var store = tx.objectStore('restaurants');
+          return store.put(rest);
+        });
       });
 
 
