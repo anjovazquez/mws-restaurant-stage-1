@@ -161,7 +161,20 @@ self.addEventListener('sync', function (event) {
       console.log('Error in review synchronization',error);
     }));
   }
+  else{
+    if (event.tag === 'pending_favourite') {
+      event.waitUntil(sendPendingFavourites().then(function () {
+        console.log('Review synchronized');
+      }).catch(function (error) {
+        console.log('Error in review synchronization',error);
+      }));
+    }
+  }
 });
+
+function sendPendingFavourites() {
+  console.log();
+}
 
 function sendPendingReviews() {
   //Query pendingreviews in local database

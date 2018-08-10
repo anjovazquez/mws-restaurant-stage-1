@@ -36,7 +36,7 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
     const option = document.createElement('option');
     option.innerHTML = neighborhood;
     option.value = neighborhood;
-    option.setAttribute("role","option");
+    option.setAttribute("role", "option");
     select.append(option);
   });
 };
@@ -65,17 +65,17 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
     const option = document.createElement('option');
     option.innerHTML = cuisine;
     option.value = cuisine;
-    option.setAttribute("role","option");
+    option.setAttribute("role", "option");
     select.append(option);
   });
 }
 
 initMap = () => {
   self.newMap = L.map('map', {
-        center: [40.722216, -73.987501],
-        zoom: 12,
-        scrollWheelZoom: false
-      });
+    center: [40.722216, -73.987501],
+    zoom: 12,
+    scrollWheelZoom: false
+  });
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
     mapboxToken: 'pk.eyJ1IjoiYW5qb3ZhenF1ZXoiLCJhIjoiY2o2dHcza2Y0MHduYTJxcXN6NHAzbDZpZCJ9.jj-yFqjE7Ru3YVtIcdcgXw',
     maxZoom: 18,
@@ -153,25 +153,25 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 
   var lazyImages = [].slice.call(document.querySelectorAll("img.lazy"));
 
-    if ("IntersectionObserver" in window) {
-        let lazyImageObserver = new IntersectionObserver(function (entries, observer) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting) {
-                    let lazyImage = entry.target;
-                    lazyImage.src = lazyImage.dataset.src;
-                    lazyImage.srcset = lazyImage.dataset.srcset;
-                    lazyImage.classList.remove("lazy");
-                    lazyImageObserver.unobserve(lazyImage);
-                }
-            });
-        });
+  if ("IntersectionObserver" in window) {
+    let lazyImageObserver = new IntersectionObserver(function (entries, observer) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          let lazyImage = entry.target;
+          lazyImage.src = lazyImage.dataset.src;
+          lazyImage.srcset = lazyImage.dataset.srcset;
+          lazyImage.classList.remove("lazy");
+          lazyImageObserver.unobserve(lazyImage);
+        }
+      });
+    });
 
-        lazyImages.forEach(function (lazyImage) {
-            lazyImageObserver.observe(lazyImage);
-        });
-    } else {
-        // Possibly fall back to a more compatible method here
-    }
+    lazyImages.forEach(function (lazyImage) {
+      lazyImageObserver.observe(lazyImage);
+    });
+  } else {
+    // Possibly fall back to a more compatible method here
+  }
 }
 
 /**
@@ -200,15 +200,53 @@ createRestaurantHTML = (restaurant) => {
   name.innerHTML = restaurant.name;
   restaurantCardBody.append(name);
 
-  const favouriteCheck = document.createElement('input');
-  favouriteCheck.setAttribute('type', 'checkbox');
-  favouriteCheck.setAttribute('id', 'toggle-heart');
-  restaurantCardBody.append(favouriteCheck);
-
   const favourite = document.createElement('label');
   favourite.innerHTML = '❤';
-  favourite.htmlFor = 'toggle-heart';
+  favourite.className = 'fav_no';
+  favourite.setAttribute('data-id', restaurant.id);
   restaurantCardBody.append(favourite);
+
+  favourite.addEventListener('click', (e) => {   
+
+    if (e.target.className === 'fav_no') {
+      e.target.className = 'fav_yes';
+    }
+    else {
+      e.target.className = 'fav_no';
+    }
+
+    navigator.serviceWorker.ready.then(function (registration) {
+      
+      let pending_favourite = { 
+        favourite: e.target.className === 'fav_yes',
+        restaurantId : e.target.getAttribute('data-id') };
+
+      idb.open('pending_favourite', 1, function (upgradeDb) {
+        upgradeDb.createObjectStore('pending_favourite', { autoIncrement: true, keyPath: 'id' });
+      }).then((database) => {
+        var trans = database.transaction('pending_favourite', 'readwrite');
+        return trans.objectStore('pending_favourite').put(pending_favourite);
+      }).then(() => {
+        if (!navigator.onLine) {
+          window.addEventListener('online', (event) => {
+            console.log('Online again');
+            registration.sync.register('pending_favourite').then(function () {
+              console.log('Synchronization registered' + pending_favourite);
+            });
+          });
+          return;
+        }
+        else {
+          return registration.sync.register('pending_favourite').then(function () {
+            console.log('Synchronization registered' + pending_favourite);
+          });
+        }
+      });
+
+
+    });
+  });
+
 
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;
@@ -223,7 +261,7 @@ createRestaurantHTML = (restaurant) => {
   more.href = DBHelper.urlForRestaurant(restaurant);
   more.setAttribute('aria-label', 'View Details for ' + restaurant.name);
   restaurantCardBody.append(more);
-  
+
   li.append(restaurantCardBody);
 
   return li;
@@ -238,7 +276,7 @@ addMarkersToMap = (restaurants = self.restaurants) => {
       window.location.href = marker.options.url;
     }
   });
-} 
+}
 
 /**
  * Add markers for current restaurants to the map.

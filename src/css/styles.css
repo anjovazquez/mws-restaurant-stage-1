@@ -454,18 +454,12 @@ p.review-rating {
   top: 0;
 }
 
-[id='toggle-heart'] {
-  position: absolute;
-  left: -100vw;
-}
-
-[id='toggle-heart']:checked+label {
+.fav_yes {
   color: #e2264d;
+  font-size: 2em;
 }
 
-[for='toggle-heart'] {
-  align-self: center;
+.fav_no {
   color: #aab8c2;
   font-size: 2em;
-  cursor: pointer;
 }

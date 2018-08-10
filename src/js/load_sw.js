@@ -61,10 +61,6 @@ if ('serviceWorker' in navigator) {
 
                 }
 
-                if (window.location.pathname === '/index.html') {
-                    console.log("hello");
-                }
-
             });
 
             
